@@ -1,0 +1,6 @@
+
+ Se requiere procesar el pago de un cliente e ideintificar a través de su numero de cliente
+ Si transaccionCompra com un promoción en sumembresia de lealtad
+
+ El proceso de pago se compone del articulo que compra, monto, datos de la tarjeta y numero de cliente
+
