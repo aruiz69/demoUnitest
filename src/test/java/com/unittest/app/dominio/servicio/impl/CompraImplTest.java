@@ -2,10 +2,8 @@ package com.unittest.app.dominio.servicio.impl;
 
 import com.unittest.app.dominio.modelo.*;
 import com.unittest.app.dominio.repositorio.ControlPagoRepo;
-import com.unittest.app.excepcion.CompraPagoNoCompletoException;
 import com.unittest.app.integracion.Membresia;
 import com.unittest.app.integracion.PagoEnLinea;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,21 +38,9 @@ class CompraImplTest {
     void setUp() {
 
         transaccionCompra = new TransaccionCompra();
-        List<Producto> productos = Arrays.asList(Producto.builder()
-                        .descripcionProducto("Libro A")
-                        .id(1)
-                        .precio(283.98).build(),
-                Producto.builder()
-                        .descripcionProducto("Libro B")
-                        .id(2)
-                        .precio(359.20).build()
-        );
+        List<Producto> productos = Arrays.asList(Producto.builder().descripcionProducto("Libro A").id(1).precio(283.98).build(), Producto.builder().descripcionProducto("Libro B").id(2).precio(359.20).build());
 
-        cliente = Cliente.builder()
-                .nickName("Nick")
-                .numeroCliente(12293232)
-                .nombre("Pedro Infante")
-                .build();
+        cliente = Cliente.builder().nickName("Nick").numeroCliente(12293232).nombre("Pedro Infante").build();
 
 
         transaccionCompra.setProductoList(productos);
@@ -62,56 +48,9 @@ class CompraImplTest {
     }
 
     @Test()
-    void ventaDeProductoPagoEnLineaPagoNoCompleto() {
-
-        List<DatosPago> datosPagos = Arrays.asList(
-                DatosPago.builder()
-                        .tipoPago(TipoPago.TD)
-                        .montoPagado(500.00)
-                        .build()
-        );
-        transaccionCompra.setDatosPago(datosPagos);
-        Mockito.when(membresiaSrv.membreciaVigente(Mockito.any(Cliente.class))).thenReturn(Boolean.TRUE);
-        Mockito.when(membresiaSrv.obtenerMembrecia(Mockito.any(Cliente.class))).thenReturn(TipoMembresia.DIAMANTE);
-        CompraPagoNoCompletoException data = Assertions.assertThrows(CompraPagoNoCompletoException.class,
-                () -> compra.ventaDeProductoPagoEnLinea(transaccionCompra, cliente));
-        assertEquals( "Error Pago no completo",data.getMessage(), "Mensaje error no esperado");
-    }
-
-    @Test()
-    void ventaDeProductoPagoEnLineaPagoNoAprobado() {
-
-        List<DatosPago> datosPagos = Arrays.asList(
-                DatosPago.builder()
-                        .tipoPago(TipoPago.TD)
-                        .montoPagado(700.00)
-                        .build()
-        );
-        transaccionCompra.setDatosPago(datosPagos);
-        Mockito.when(membresiaSrv.membreciaVigente(Mockito.any(Cliente.class))).thenReturn(Boolean.TRUE);
-        Mockito.when(membresiaSrv.obtenerMembrecia(Mockito.any(Cliente.class))).thenReturn(TipoMembresia.DIAMANTE);
-        Mockito.when(pagoEnLinea.obtenerAprobacionPago(Mockito.any(DatosPago.class))).thenReturn(Boolean.FALSE);
-        IllegalStateException data = Assertions.assertThrows(IllegalStateException.class,
-                () -> compra.ventaDeProductoPagoEnLinea(transaccionCompra, cliente));
-        assertEquals( "Pago No Aprobado ",data.getMessage(), "Mensaje error no esperado");
-    }
-
-    @Test()
     void ventaDeProductoPagoEnLineaMembresiaDiamante() {
 
-        List<DatosPago> datosPagos = Arrays.asList(
-                DatosPago.builder()
-                        .tipoPago(TipoPago.TD)
-                        .montoPagado(302.00)
-                        .build(),
-                DatosPago.builder()
-                        .tipoPago(TipoPago.TD)
-                        .montoPagado(320.00)
-                        .build(),
-                DatosPago.builder()
-                        .tipoPago(TipoPago.TD)
-                        .montoPagado(143.18)
-                        .build());
+        List<DatosPago> datosPagos = Arrays.asList(DatosPago.builder().tipoPago(TipoPago.TD).montoPagado(302.00).build(), DatosPago.builder().tipoPago(TipoPago.TD).montoPagado(320.00).build(), DatosPago.builder().tipoPago(TipoPago.TD).montoPagado(143.18).build());
         transaccionCompra.setDatosPago(datosPagos);
 
         Pago resultado = new Pago();
@@ -121,7 +60,6 @@ class CompraImplTest {
         Mockito.when(membresiaSrv.membreciaVigente(Mockito.any(Cliente.class))).thenReturn(Boolean.TRUE);
         Mockito.when(membresiaSrv.obtenerMembrecia(Mockito.any(Cliente.class))).thenReturn(TipoMembresia.DIAMANTE);
         Mockito.when(controlPagoRepo.guardarPago(pagoCaptor.capture())).thenReturn(resultado);
-        Mockito.when(pagoEnLinea.obtenerAprobacionPago(Mockito.any(DatosPago.class))).thenReturn(Boolean.TRUE);
         Pago pagoRegreso = compra.ventaDeProductoPagoEnLinea(transaccionCompra, cliente);
         Pago pagoAPersistencia = pagoCaptor.getValue();
         assertEquals(pagoRegreso.getEstatusDePago(), pagoAPersistencia.getEstatusDePago(), "El pago tiene estaus diferente a PAGADO");
