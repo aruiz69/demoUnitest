@@ -6,5 +6,5 @@ public interface ControlPagoRepo {
     Pago guardarPago(Pago pago);
     Pago pagoCancelado(int pagoId);
     Pago consultarPago(Integer folioPago);
-
+   // Operaciones de exclusivo de Caja
 }
