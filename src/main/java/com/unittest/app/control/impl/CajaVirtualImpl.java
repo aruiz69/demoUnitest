@@ -1,12 +1,10 @@
 package com.unittest.app.control.impl;
 
-import com.unittest.app.Repositorio.ProductoRepo;
 import com.unittest.app.control.CajaVirtual;
-import com.unittest.app.modelo.*;
-import com.unittest.app.modelo.dto.ClienteCuentaDto;
-import com.unittest.app.modelo.dto.DatoPagoCuentaDto;
-import com.unittest.app.modelo.dto.ProductoCuentaDto;
-import com.unittest.app.servicio.Compra;
+import com.unittest.app.dominio.repositorio.ControlPagoRepo;
+import com.unittest.app.dominio.modelo.Pago;
+import com.unittest.app.dominio.modelo.TransaccionCompra;
+import com.unittest.app.dominio.servicio.Compra;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,42 +15,18 @@ public class CajaVirtualImpl implements CajaVirtual {
     @Autowired
     Compra compra;
     @Autowired
-    ProductoRepo productoRepo;
+    ControlPagoRepo controlPagoRepo;
 
     @Override
-    @GetMapping("/producto/{Id}")
-    public Producto consultarProducto(@PathVariable(value="Id")Integer productoId) {
-        return productoRepo.obtenerProducto(productoId);
+    @GetMapping("/pago/{folio}")
+    public Pago consultarPago(@PathVariable(value = "folio") Integer folio) {
+        return controlPagoRepo.consultarPago(folio);
     }
-
 
     @Override
     @PostMapping("/pago")
     public Pago procesarPago(TransaccionCompra transaccionCompra) {
-        return compra.ventaDeProducto(transaccionCompra, transaccionCompra.getCliente());
-    }
-
-
-    @Override
-    @PostMapping("/producto/cuenta")
-    public TransaccionCompra addProductoCuenta(ProductoCuentaDto productoCuentaDto) {
-        return compra.agregarProducto(productoCuentaDto);
-    }
-
-    @Override
-    public TransaccionCompra removerProductoCuenta(ProductoCuentaDto productoCuentaDto) {
-        return productoCuentaDto.getTransaccionCompra().retirarProducto(productoCuentaDto.getProducto());
-    }
-
-    @Override
-    @PostMapping("/cliente/cuenta")
-    public TransaccionCompra agregarInformacionCliente(ClienteCuentaDto clienteCuentaDto) {
-        return compra.agregarCliente(clienteCuentaDto);
-    }
-
-    @Override
-    public TransaccionCompra agregarInformacionPago(DatoPagoCuentaDto datoPagoCuentaDto) {
-        return compra.agregarDatosPago(datoPagoCuentaDto);
+        return compra.ventaDeProductoPagoEnLinea(transaccionCompra, transaccionCompra.getCliente());
     }
 
     @Override

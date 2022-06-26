@@ -1,6 +1,15 @@
 
  Se requiere procesar el pago de un cliente e ideintificar a través de su numero de cliente
- Si transaccionCompra com un promoción en sumembresia de lealtad
+ El tipo de membresia que tiene y de acuerdo a ella se aplica un descuento
+ El proceso de pago se compone del articulo que compra, monto, datos de la tarjeta y numero de cliente etc
 
- El proceso de pago se compone del articulo que compra, monto, datos de la tarjeta y numero de cliente
+ Datos de Prueba
+Compra :
+Libro A, $ 283.98
+Libro B, $ 359.20
 
+SubTotal 643.18
+
+Pagos completo 643.18
+Diamante descuento del 15 %  Descuent de $96.47
+Oro descuento del 10 %  Descuent de $64.31

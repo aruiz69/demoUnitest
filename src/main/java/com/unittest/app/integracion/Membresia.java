@@ -1,8 +1,9 @@
 package com.unittest.app.integracion;
 
-import com.unittest.app.modelo.Cliente;
+import com.unittest.app.dominio.modelo.Cliente;
+import com.unittest.app.dominio.modelo.TipoMembresia;
 
 public interface Membresia {
-    com.unittest.app.modelo.Membresia obtenerMembrecia(Cliente cliente);
+    TipoMembresia obtenerMembrecia(Cliente cliente);
     boolean membreciaVigente(Cliente cliente);
 }
