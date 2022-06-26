@@ -22,9 +22,7 @@ public class CompraImpl implements Compra {
     @Autowired
     Membresia membresiaSrv;
 
-    /*@Autowired
-    List<DescuentoMembresia> descuentoMembresias;
-    */
+
     @Override
     public Pago ventaDeProductoPagoEnLinea(TransaccionCompra transaccionCompra, Cliente cliente) {
         Pago pago = new Pago();
@@ -46,11 +44,7 @@ public class CompraImpl implements Compra {
                     descuento = subtotal * 0.05;
                     break;
             }
-            /*Strategy classes
-            descuento = descuentoMembresias.stream()
-                    .filter(desc -> desc.obtenerTipo()==tipoMembresia)
-                    .findAny().get().obtenerDescuento(subtotal);
-             */
+
             pago.setDescuento(descuento);
 
         }
@@ -94,6 +88,7 @@ public class CompraImpl implements Compra {
                 });
 
         calCuloPagoDto.getPago().setEstatusDePago(EstatusDePago.PAGADO);
+
         return controlPagoRepo.guardarPago(calCuloPagoDto.getPago());
     }
 
