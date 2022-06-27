@@ -25,10 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class CompraImplParametrizableTest {
     @Mock
     ControlPagoRepo controlPagoRepo;
-
     @Captor
     ArgumentCaptor<Pago> pagoCaptor;
-
     @Mock
     PagoEnLinea pagoEnLinea;
     @Mock
@@ -40,10 +38,8 @@ class CompraImplParametrizableTest {
     TransaccionCompra transaccionCompra;
     Cliente cliente;
 
-
     @BeforeEach
     void setUp() {
-
         transaccionCompra = new TransaccionCompra();
         List<Producto> productos = Arrays.asList(Producto.builder()
                         .descripcionProducto("Libro A")
@@ -54,13 +50,11 @@ class CompraImplParametrizableTest {
                         .id(2)
                         .precio(359.20).build()
         );
-
         cliente = Cliente.builder()
                 .nickName("Nick")
                 .numeroCliente(12293232)
                 .nombre("Pedro Infante")
                 .build();
-
 
         transaccionCompra.setProductoList(productos);
         transaccionCompra.setCliente(cliente);
