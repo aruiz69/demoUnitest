@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class Plata implements DescuentoMembresia{
     @Override
     public Double obtenerDescuento(Double subTotal) {
-        return subTotal*0.15;
+        return subTotal*0.05;
     }
 
     @Override

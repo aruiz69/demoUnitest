@@ -2,6 +2,8 @@ package com.unittest.app.dominio.servicio.impl;
 
 import com.unittest.app.dominio.modelo.*;
 import com.unittest.app.dominio.repositorio.ControlPagoRepo;
+import com.unittest.app.dominio.servicio.reglas.DescuentoMembresia;
+import com.unittest.app.dominio.servicio.reglas.Diamante;
 import com.unittest.app.excepcion.CompraPagoNoCompletoException;
 import com.unittest.app.integracion.Membresia;
 import com.unittest.app.integracion.PagoEnLinea;
@@ -29,6 +31,9 @@ class CompraImplTest {
     PagoEnLinea pagoEnLinea;
     @Mock
     Membresia membresiaSrv;
+
+    @Mock
+    List<DescuentoMembresia> descuentoMembresias;
 
     @InjectMocks
     CompraImpl compra;
@@ -71,11 +76,12 @@ class CompraImplTest {
                         .build()
         );
         transaccionCompra.setDatosPago(datosPagos);
+        Mockito.when(descuentoMembresias.stream()).thenReturn(Arrays.stream(new DescuentoMembresia[]{new Diamante()}));
         Mockito.when(membresiaSrv.membreciaVigente(Mockito.any(Cliente.class))).thenReturn(Boolean.TRUE);
         Mockito.when(membresiaSrv.obtenerMembrecia(Mockito.any(Cliente.class))).thenReturn(TipoMembresia.DIAMANTE);
         CompraPagoNoCompletoException data = Assertions.assertThrows(CompraPagoNoCompletoException.class,
                 () -> compra.ventaDeProductoPagoEnLinea(transaccionCompra, cliente));
-        assertEquals( "Error Pago no completo",data.getMessage(), "Mensaje error no esperado");
+        assertEquals("Error Pago no completo", data.getMessage(), "Mensaje error no esperado");
     }
 
     @Test()
@@ -91,9 +97,10 @@ class CompraImplTest {
         Mockito.when(membresiaSrv.membreciaVigente(Mockito.any(Cliente.class))).thenReturn(Boolean.TRUE);
         Mockito.when(membresiaSrv.obtenerMembrecia(Mockito.any(Cliente.class))).thenReturn(TipoMembresia.DIAMANTE);
         Mockito.when(pagoEnLinea.obtenerAprobacionPago(Mockito.any(DatosPago.class))).thenReturn(Boolean.FALSE);
+        Mockito.when(descuentoMembresias.stream()).thenReturn(Arrays.stream(new DescuentoMembresia[]{new Diamante()}));
         IllegalStateException data = Assertions.assertThrows(IllegalStateException.class,
                 () -> compra.ventaDeProductoPagoEnLinea(transaccionCompra, cliente));
-        assertEquals( "Pago No Aprobado ",data.getMessage(), "Mensaje error no esperado");
+        assertEquals("Pago No Aprobado ", data.getMessage(), "Mensaje error no esperado");
     }
 
     @Test()
@@ -122,6 +129,7 @@ class CompraImplTest {
         Mockito.when(membresiaSrv.obtenerMembrecia(Mockito.any(Cliente.class))).thenReturn(TipoMembresia.DIAMANTE);
         Mockito.when(controlPagoRepo.guardarPago(pagoCaptor.capture())).thenReturn(resultado);
         Mockito.when(pagoEnLinea.obtenerAprobacionPago(Mockito.any(DatosPago.class))).thenReturn(Boolean.TRUE);
+        Mockito.when(descuentoMembresias.stream()).thenReturn(Arrays.stream(new DescuentoMembresia[]{new Diamante()}));
         Pago pagoRegreso = compra.ventaDeProductoPagoEnLinea(transaccionCompra, cliente);
         Pago pagoAPersistencia = pagoCaptor.getValue();
         assertEquals(pagoRegreso.getEstatusDePago(), pagoAPersistencia.getEstatusDePago(), "El pago tiene estaus diferente a PAGADO");

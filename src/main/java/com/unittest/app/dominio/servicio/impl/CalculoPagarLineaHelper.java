@@ -40,18 +40,18 @@ class CalculoPagarLineaHelper {
         return calCuloPagoDto;
     }
 
-    void pagosAutorizados(CalCuloPagoDto calCuloPagoDto, PagoEnLinea pagoEnLinea) {
+    static void pagosAutorizados(CalCuloPagoDto calCuloPagoDto, PagoEnLinea pagoEnLinea) {
         if(calCuloPagoDto == null || pagoEnLinea == null){
             throw new IllegalArgumentException("La refencia de calCuloPagoDto o el pagoEnLinea no puede venir en null");
         }
         calCuloPagoDto.getPagosPorAutorizar()
                 .stream()
-                .map(pagoEnLinea::obtenerAprobacionPago)
+                .map(datoPago -> pagoEnLinea.obtenerAprobacionPago(datoPago))
                 .collect(Collectors.toList())
                 .stream().filter(result -> result.booleanValue() == Boolean.FALSE)
                 .findAny()
                 .ifPresent(controlPago -> {
-                    throw new PagoNoAutorizado("Pago No Aprobado " + controlPago);
+                    throw new IllegalStateException("Pago No Aprobado ");
                 });
     }
 

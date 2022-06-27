@@ -2,6 +2,10 @@ package com.unittest.app.dominio.servicio.impl;
 
 import com.unittest.app.dominio.modelo.*;
 import com.unittest.app.dominio.repositorio.ControlPagoRepo;
+import com.unittest.app.dominio.servicio.reglas.DescuentoMembresia;
+import com.unittest.app.dominio.servicio.reglas.Diamante;
+import com.unittest.app.dominio.servicio.reglas.Oro;
+import com.unittest.app.dominio.servicio.reglas.Plata;
 import com.unittest.app.integracion.Membresia;
 import com.unittest.app.integracion.PagoEnLinea;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +33,8 @@ class CompraImplParametrizableTest {
     PagoEnLinea pagoEnLinea;
     @Mock
     Membresia membresiaSrv;
-
+    @Mock
+    List<DescuentoMembresia> descuentoMembresias;
     @InjectMocks
     CompraImpl compra;
     TransaccionCompra transaccionCompra;
@@ -63,7 +68,7 @@ class CompraImplParametrizableTest {
 
     @ParameterizedTest
     @MethodSource("getParameters")
-    void ventaDeProductoPagoEnLineaParametrizado(TipoMembresia membresia, Pago pago) {
+    void ventaDeProductoPagoEnLineaParametrizado(TipoMembresia membresia, Pago pago, DescuentoMembresia descuentoMembresia) {
 
         List<DatosPago> datosPagos = Arrays.asList(
                 DatosPago.builder()
@@ -77,6 +82,7 @@ class CompraImplParametrizableTest {
         Mockito.when(membresiaSrv.obtenerMembrecia(Mockito.any(Cliente.class))).thenReturn(membresia);
         Mockito.when(controlPagoRepo.guardarPago(pagoCaptor.capture())).thenReturn(pago);
         Mockito.when(pagoEnLinea.obtenerAprobacionPago(Mockito.any(DatosPago.class))).thenReturn(Boolean.TRUE);
+        Mockito.when(descuentoMembresias.stream()).thenReturn(Arrays.stream(new DescuentoMembresia[]{descuentoMembresia}));
         Pago pagoRegreso = compra.ventaDeProductoPagoEnLinea(transaccionCompra, cliente);
         Pago pagoAPersistencia = pagoCaptor.getValue();
         assertEquals(pagoRegreso.getEstatusDePago() , pagoAPersistencia.getEstatusDePago(), "El pago tiene estaus diferente a PAGADO");
@@ -101,9 +107,9 @@ class CompraImplParametrizableTest {
         pagoPlata.setTotal(643.18 * .95);
 
         return Stream.of(
-                Arguments.of(TipoMembresia.DIAMANTE, pagoDiamente),
-                Arguments.of(TipoMembresia.ORO, pagoOro),
-                Arguments.of(TipoMembresia.PLATA, pagoPlata)
+                Arguments.of(TipoMembresia.DIAMANTE, pagoDiamente, new Diamante()),
+                Arguments.of(TipoMembresia.ORO, pagoOro, new Oro()),
+                Arguments.of(TipoMembresia.PLATA, pagoPlata, new Plata())
         );
     }
 }
